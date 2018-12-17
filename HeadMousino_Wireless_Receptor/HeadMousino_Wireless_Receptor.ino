@@ -39,14 +39,14 @@ const int ledPin = 13;         // LED indicativo do controle do mouse
 bool mouseIsActive = false;    // quando ou não ativar o mouse
 int lastSwitchState = HIGH;        // estado anterior do botao/switch
 // threshold para decidir quando e ou nao efetuado o click do mouse
-const int threshold = 100;
+const int threshold = 60;
 // configuracao para ajustar a sensitividade e velocidade do mouse.
 // X axis (esquerda/direita) configuracao:
-#define XACCEL_MIN 1      // Valor minimo da aceleracao no eixo X , valores abaixo
+#define XACCEL_MIN 0.1      // Valor minimo da aceleracao no eixo X , valores abaixo
                             // nao irao mexer o mouse.
-#define XACCEL_MAX 30      // Valor maximo da aceleracao no eixo X, valores acima
+#define XACCEL_MAX 30.0      // Valor maximo da aceleracao no eixo X, valores acima
                             // irao mover o mouse o mais rápido possível.
-#define XMOUSE_RANGE 60   // Amplitude de velocidade para o movimento do mouse. Quanto maior
+#define XMOUSE_RANGE 120   // Amplitude de velocidade para o movimento do mouse. Quanto maior
                             // este valor, mais rapidamente o mouse ira se mover.
 #define XMOUSE_SCALE 1      // Scala para aplicar o movimento do  mouse, isto é
                             // util ao setarmos para -1 para inverter o movimento no eixo X.
@@ -163,13 +163,13 @@ void loop() {
       }
     }
     
-    int x = gyro_motion(payload[4]);
-    int y = gyro_motion(payload[5]);
+    float x = gyro_motion(payload[4]);
+    float y = gyro_motion(payload[5]);
     // Usa a magnitude da acceleration/gyro para interpolar a velocidade do mouse.
-    int x_mag = abs(x);
-    int x_mouse = lerp(x_mag, XACCEL_MIN, XACCEL_MAX, 0, XMOUSE_RANGE);
-    int y_mag = abs(y);
-    int y_mouse = lerp(y_mag, YACCEL_MIN, YACCEL_MAX, 0, YMOUSE_RANGE);
+    float x_mag = abs(x);
+    float x_mouse = lerp(x_mag, XACCEL_MIN, XACCEL_MAX, 0, XMOUSE_RANGE);
+    float y_mag = abs(y);
+    float y_mouse = lerp(y_mag, YACCEL_MIN, YACCEL_MAX, 0, YMOUSE_RANGE);
     //mudar a direcao do mouse baseado na direcao do gyro.
     if (x < 0) {
       x_mouse *= -1;
@@ -177,11 +177,13 @@ void loop() {
     if (y < 0) {
       y_mouse *= -1;
     }
-
+    x_mouse = floor(x_mouse*XMOUSE_SCALE);
+    y_mouse = floor(y_mouse*YMOUSE_SCALE);
+    
     if(mouseIsActive){
       //Serial.println("Mouse ativo");
-      Mouse.move(-x_mouse, y_mouse, 0);
+      Mouse.move(int(-x_mouse), int(y_mouse), 0);
     }
   }
-  delay(5);
+  delay(10);
 }
