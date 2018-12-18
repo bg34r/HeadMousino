@@ -11,7 +11,7 @@
  * exemplo de comunicacao dos radios RF24
  * 
  * 
- * by Bruno Araujo, @github
+ * by Bruno Araujo, https://github.com/bg34r/HeadMousino
  */
 
 #include <Wire.h>
